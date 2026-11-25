@@ -7,7 +7,8 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!worker-configuration.d.ts"]
+		"includes": ["**", "!worker-configuration.d.ts"],
+		"maxSize": 8388608
 	},
 	"formatter": {
 		"enabled": true,
@@ -26,17 +27,18 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/*.svelte"],
+			"includes": ["*.html"],
 			"linter": {
-				"rules": {
-					"correctness": {
-						"noUnusedVariables": "off",
-						"noUnusedImports": "off"
-					}
-				}
+				"enabled": false
 			}
 		}
 	],
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"enabled": true
+		}
+	},
 	"assist": {
 		"enabled": true,
 		"actions": {

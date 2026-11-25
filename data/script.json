@@ -1,0 +1,16 @@
+{
+	"voice": "af_heart",
+	"speed": 1.15,
+	"lang": "en-us",
+	"lines": [
+		"Welcome to learn. What you are watching is a web page, not a video. learn is a Claude Code skill. Type slash learn and a topic, and you get back a page like this one that talks you through it, one scene at a time.",
+		"To install it, save its skill file into your home folder, under dot claude, skills, learn. That is the whole setup. Slash learn now works in every project.",
+		"Then ask for anything. Slash learn how DNS works. Slash learn what this PR changes. Slash learn why the tests are failing. Claude writes a script, gives it a voice, and builds the scenes to match.",
+		"What you get is one HTML file. It opens straight from disk, with no server and no internet, so you can keep it, or send it to anyone.",
+		"Press play and it walks you through. The word being spoken lights up, and you can click any word, or drag the timeline, to jump around.",
+		"Slow it down or speed it up, turn the captions off, or let it play straight through. And because it is a real web page, you can copy any text or command, follow links, and download files, right from the page.",
+		"It works on a laptop or a phone, and because it is a web page, it does not just shrink like a video. Make the window narrow, or hold your phone upright, and each scene rearranges into one column that fits.",
+		"Under the hood, it is simple. Claude writes the words. Kokoro, a free voice model, reads them on your own machine. And Svelte Kit packs it all into one HTML file.",
+		"So that is learn. Type a topic, and get a page that teaches it. This page was made using learn. Check out the GitHub."
+	]
+}

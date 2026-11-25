@@ -1,56 +1,43 @@
-# sv
+# learn
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A Claude Code skill that teaches. Type `/learn how DNS works` and you get back one `.html` file that walks you through the topic, one narrated scene at a time.
 
-## Creating a project
+It plays like a video, but it is a web page. Every word is real text you can select and copy. The word being spoken lights up in the captions, and you can click any word or drag the timeline to jump. Scenes rearrange themselves to fit a wide window or a phone held upright. The file opens straight from disk, with no server and no internet, so you can keep it or send it to anyone.
 
-If you're seeing this, you've probably already done this step. Congrats!
+See it: [bridgerb.github.io/learn](https://bridgerb.github.io/learn/). That page was made with learn.
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+## Install
 
 ```sh
-# recreate this project
-pnpm dlx sv@1.7.1 create --template minimal --types ts --install pnpm .
+mkdir -p ~/.claude/skills/learn
+curl -fsSL https://raw.githubusercontent.com/BridgerB/learn/main/.claude/skills/learn/SKILL.md \
+  -o ~/.claude/skills/learn/SKILL.md
 ```
 
-## Adding features
+Then type `/learn <topic>` in any project. It works on anything: `/learn what this PR changes`, `/learn why the tests are failing`, `/learn how DNS works`.
 
-Add features to your project with `sv add`:
+You need Node 24+, pnpm, ffmpeg, and Python 3.10–3.13. The first run downloads the voice, [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), into `~/.cache/learn` (about 340 MB). It is free and runs on your own machine.
+
+## How it works
+
+This repo is both the skill and the template it builds from. For each topic, Claude clones it, writes a script and one scene per line, records the voice, and builds the page:
 
 ```sh
-npx sv add
+pnpm new "how DNS works"   # start a page
+pnpm narrate               # record data/script.json
+pnpm build:html            # → build/learn.html, everything inlined
+pnpm check:layout          # every scene on 5 screen shapes
 ```
 
-For example, to add Tailwind CSS:
+The voice is the clock. Scene time is the narration's playback position, so picture and voice never drift.
+
+## Develop
 
 ```sh
-npx sv add tailwindcss
+pnpm install
+pnpm dev            # learn's own explainer, live
+pnpm build:index    # rebuild index.html for the site
+pnpm test           # unit + e2e
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+See `CLAUDE.md` for how the pieces fit together.

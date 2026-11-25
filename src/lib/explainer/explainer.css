@@ -1,0 +1,1009 @@
+/* Fonts are imported through url() so Vite inlines them (assetsInlineLimit: Infinity). */
+@font-face {
+	font-family: "Archivo";
+	font-weight: 500;
+	src: url("./fonts/archivo-500.woff2") format("woff2");
+}
+@font-face {
+	font-family: "Archivo";
+	font-weight: 800;
+	src: url("./fonts/archivo-800.woff2") format("woff2");
+}
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-weight: 400;
+	src: url("./fonts/plex-mono-400.woff2") format("woff2");
+}
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-weight: 600;
+	src: url("./fonts/plex-mono-600.woff2") format("woff2");
+}
+
+:root {
+	--bg: #0a0c11;
+	--card: #121620;
+	--ink: #e9ecf2;
+	--dim: #8a93a6;
+	--faint: #2a3040;
+	--red: #ff4a3d;
+	--amber: #ffb347;
+	--cyan: #4fd8ff;
+	--green: #6be58a;
+	--sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+	--mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+	--pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html,
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--ink);
+	font-family: var(--sans);
+}
+::selection {
+	background: var(--cyan);
+	color: var(--bg);
+}
+* {
+	box-sizing: border-box;
+}
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+	margin: 0;
+}
+h1,
+h2,
+h3 {
+	font-weight: 800;
+}
+
+/* ---------- the stage: fills the space above the controls, any shape ----------
+   A web page, not a video: scenes are laid out with CSS grid and reflow to fit.
+   Sizes are multiples of --u (set below from the stage size) so type stays in proportion,
+   and when the stage is taller than it is wide, every scene becomes one column. */
+.stage {
+	position: absolute;
+	inset: 0;
+	container: stage / size;
+	overflow: hidden;
+	background:
+		radial-gradient(
+			ellipse at 70% 30%,
+			rgba(79, 216, 255, 0.05),
+			transparent 70%
+		),
+		var(--bg);
+}
+.stage section {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 0.35s,
+		visibility 0.35s;
+}
+.stage section.cur {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* A scene: a title row, then a body that takes the rest. */
+/* --u: the size unit. Wide: 1% of the height, but never so big that two
+   columns get cramped. Tall: 1% of the width, but never so big that one column
+   runs off the bottom. */
+.scene,
+.foot {
+	--u: min(1cqh, 0.6cqw);
+}
+/* A scene is one frame, title and body together, centred in the stage both
+   ways: a readable column on a big screen, the whole screen on a phone. The
+   title belongs to the content, not to the corner of the stage. */
+.scene {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: min(100%, calc(150 * var(--u)));
+	align-content: center;
+	justify-content: center;
+	gap: calc(5 * var(--u));
+	padding: calc(6 * var(--u)) calc(7 * var(--u));
+}
+/* A long row (four or more cards in a flow) gets a wider frame. */
+.scene.wide {
+	grid-template-columns: min(100%, calc(190 * var(--u)));
+}
+.body {
+	display: grid;
+	align-content: center;
+	gap: calc(4 * var(--u));
+	min-height: 0;
+}
+
+/* Two halves side by side. */
+.split {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	align-items: center;
+	gap: calc(6 * var(--u));
+}
+/* Items in a row. */
+.row {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: minmax(0, 1fr);
+	align-items: center;
+	gap: calc(3 * var(--u));
+}
+/* Cards joined by arrows. */
+.flow {
+	display: flex;
+	align-items: stretch;
+	gap: calc(2 * var(--u));
+}
+.stack {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(2.5 * var(--u));
+	min-width: 0;
+}
+.wrap {
+	display: flex;
+	flex-wrap: wrap;
+	gap: calc(3 * var(--u)) calc(5 * var(--u));
+}
+
+/* Taller than wide (a narrow window, a phone held upright): one column. */
+.when-tall {
+	display: none;
+}
+@container stage (aspect-ratio < 1) {
+	.scene,
+	.foot {
+		--u: min(1.1cqw, 0.7cqh);
+	}
+	.scene {
+		gap: calc(6 * var(--u));
+		padding: calc(8 * var(--u)) calc(6 * var(--u));
+	}
+	.body {
+		gap: calc(6 * var(--u));
+	}
+	.split,
+	.row {
+		grid-template-columns: minmax(0, 1fr);
+		grid-auto-flow: row;
+		align-items: start;
+	}
+	.flow {
+		flex-direction: column;
+		gap: var(--u);
+	}
+	/* Stacked cards: tighter, so three of them and their arrows fit. */
+	.flow > .card {
+		padding: calc(2 * var(--u)) calc(3 * var(--u));
+		gap: calc(0.6 * var(--u));
+	}
+	.flow .card b {
+		font-size: calc(4.4 * var(--u));
+	}
+	.flow-arrow {
+		width: calc(4 * var(--u));
+		height: calc(4 * var(--u));
+	}
+	.flow-arrow {
+		rotate: 90deg; /* separate from the reveal's transform */
+	}
+	.when-tall {
+		display: inline;
+	}
+	.when-wide {
+		display: none;
+	}
+}
+
+/* ---------- scene shapes ---------- */
+/* Cause → effect: [what you do] → [what you get]; down when tall. */
+.cause {
+	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+	align-items: center;
+	column-gap: calc(4 * var(--u));
+}
+@container stage (aspect-ratio < 1) {
+	.cause {
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: start;
+		row-gap: calc(3 * var(--u));
+	}
+}
+/* A single story read top to bottom, centred. */
+.install {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: calc(2.6 * var(--u));
+	text-align: center;
+}
+/* A thing with a note pinned under its start. */
+.annotated {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(1.2 * var(--u));
+	max-width: 100%;
+}
+.note {
+	padding-left: calc(3 * var(--u));
+	color: var(--dim);
+}
+/* An arrow with its label beside it. */
+.step {
+	display: flex;
+	align-items: center;
+	gap: calc(2 * var(--u));
+}
+/* A row that wraps onto more lines as space runs out. */
+.band {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: calc(3 * var(--u)) calc(5 * var(--u));
+}
+.band-split {
+	display: flex;
+	flex-direction: column;
+	gap: calc(2 * var(--u));
+	padding-top: calc(4 * var(--u));
+	border-top: 2px solid var(--faint);
+}
+
+/* ---------- type ---------- */
+.title {
+	font-size: calc(8 * var(--u));
+	line-height: 1.05;
+	letter-spacing: -0.01em;
+}
+.hero {
+	font-size: calc(22 * var(--u));
+	line-height: 0.95;
+	letter-spacing: -0.04em;
+}
+.lg {
+	font-size: calc(6 * var(--u));
+	font-weight: 800;
+	line-height: 1.15;
+}
+.md {
+	font-size: calc(4.4 * var(--u));
+	font-weight: 500;
+	line-height: 1.25;
+}
+.sm {
+	font-family: var(--mono);
+	font-size: max(12px, calc(3.2 * var(--u)));
+	font-weight: 600;
+	line-height: 1.3;
+}
+.mono {
+	font-family: var(--mono);
+}
+.dim {
+	color: var(--dim);
+}
+.amber {
+	color: var(--amber);
+}
+.red {
+	color: var(--red);
+}
+.green {
+	color: var(--green);
+}
+.cyan {
+	color: var(--cyan);
+}
+
+/* ---------- reveals: `on` is switched by the voice clock ---------- */
+.r {
+	opacity: 0;
+	transform: translateY(calc(1.5 * var(--u)));
+	transition:
+		opacity 0.45s var(--out),
+		transform 0.45s var(--out);
+}
+.pop {
+	opacity: 0;
+	transform: scale(0.8);
+	transition:
+		opacity 0.3s,
+		transform 0.5s var(--pop);
+}
+.wipe {
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 1.2s linear;
+}
+.r.on,
+.pop.on {
+	opacity: 1;
+	transform: none;
+}
+.wipe.on {
+	clip-path: inset(0 0 0 0);
+}
+/* Nothing can be clicked before it has appeared. */
+.r:not(.on),
+.pop:not(.on) {
+	pointer-events: none;
+}
+
+/* ---------- parts ---------- */
+.card {
+	overflow-wrap: break-word; /* a word too long for the card (a domain, a path) wraps rather than spilling */
+	background: var(--card);
+	border: 2px solid var(--cyan);
+	border-radius: calc(2.4 * var(--u));
+	padding: calc(3 * var(--u)) calc(3.5 * var(--u));
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: calc(1.4 * var(--u));
+	min-width: 0;
+}
+.card b {
+	font-size: calc(5 * var(--u));
+	font-weight: 800;
+	line-height: 1.1;
+}
+.card small {
+	font-family: var(--mono);
+	font-size: max(12px, calc(2.8 * var(--u)));
+	color: var(--dim);
+}
+.card.plain {
+	border-color: var(--faint);
+}
+.flow > .card {
+	flex: 1;
+}
+.flow-arrow {
+	flex: none;
+	align-self: center;
+	width: calc(5 * var(--u));
+	height: calc(5 * var(--u));
+	color: var(--amber);
+}
+.cmd {
+	background: var(--card);
+	border: 2px solid var(--faint);
+	border-radius: calc(1.8 * var(--u));
+	padding: calc(1.6 * var(--u)) calc(2.6 * var(--u));
+	font-family: var(--mono);
+	font-size: calc(4 * var(--u));
+	font-weight: 600;
+	color: var(--amber);
+	overflow-wrap: anywhere;
+	max-width: 100%;
+}
+.cmd span {
+	color: var(--dim);
+	font-weight: 400;
+}
+.path {
+	background: var(--card);
+	border: 2px solid var(--faint);
+	border-radius: calc(1.8 * var(--u));
+	padding: calc(2 * var(--u)) calc(3 * var(--u));
+	font-family: var(--mono);
+	font-size: calc(4.2 * var(--u));
+	font-weight: 600;
+	overflow-wrap: anywhere;
+	max-width: 100%;
+}
+.path .hot {
+	color: var(--amber);
+}
+.path.big {
+	font-size: calc(5.4 * var(--u));
+}
+.flow-arrow.down {
+	rotate: 90deg;
+}
+/* A note that belongs to one card. */
+.badge {
+	align-self: flex-start;
+	margin-top: calc(0.6 * var(--u));
+	padding: calc(0.6 * var(--u)) calc(1.6 * var(--u));
+	border: 1px solid var(--cyan);
+	border-radius: calc(3 * var(--u));
+	font-family: var(--mono);
+	font-size: max(12px, calc(2.6 * var(--u)));
+	font-weight: 600;
+	color: var(--cyan);
+}
+/* A tick or cross beside its text. */
+.mark {
+	display: flex;
+	align-items: center;
+	gap: calc(2 * var(--u));
+}
+.mark svg {
+	flex: none;
+	width: calc(5 * var(--u));
+	height: calc(5 * var(--u));
+}
+.list {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: calc(2 * var(--u));
+}
+.wave {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+.wave rect {
+	fill: var(--cyan);
+}
+.strip {
+	display: flex;
+	gap: calc(1.4 * var(--u));
+	width: 100%;
+}
+.strip i {
+	flex: 1;
+	height: calc(1.4 * var(--u));
+	border-radius: calc(0.7 * var(--u));
+	background: var(--faint);
+}
+.strip i.cur {
+	background: var(--red);
+}
+.chip {
+	padding: calc(1.6 * var(--u)) calc(2.8 * var(--u));
+	border: 2px solid var(--amber);
+	border-radius: calc(1.6 * var(--u));
+	background: #1d2433;
+	color: var(--amber);
+	font-size: calc(4.2 * var(--u));
+	font-weight: 800;
+}
+.pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: calc(1.6 * var(--u));
+}
+.pill {
+	padding: calc(1.2 * var(--u)) calc(2.6 * var(--u));
+	border: 2px solid var(--faint);
+	border-radius: calc(1.4 * var(--u));
+	background: var(--card);
+	font-family: var(--mono);
+	font-size: calc(3.8 * var(--u));
+	font-weight: 600;
+}
+.pill.on {
+	background: var(--cyan);
+	border-color: var(--cyan);
+	color: var(--bg);
+}
+.label-sm {
+	display: block;
+	margin-bottom: calc(1.4 * var(--u));
+	color: var(--dim);
+	font-family: var(--mono);
+	font-size: max(12px, calc(3 * var(--u)));
+}
+.file {
+	border: 3px solid var(--cyan);
+	border-radius: calc(2.4 * var(--u)) calc(7 * var(--u)) calc(2.4 * var(--u))
+		calc(2.4 * var(--u));
+	background: var(--card);
+	padding: calc(4 * var(--u));
+	display: flex;
+	flex-direction: column;
+	gap: calc(2.4 * var(--u));
+	width: fit-content;
+	max-width: 100%;
+	justify-self: center;
+}
+.file-name {
+	font-family: var(--mono);
+	font-size: calc(4 * var(--u));
+	font-weight: 600;
+	color: var(--cyan);
+	overflow-wrap: anywhere;
+}
+.recap {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: calc(2.4 * var(--u));
+}
+.recap li {
+	display: flex;
+	align-items: center;
+	gap: calc(2.4 * var(--u));
+	font-size: calc(5 * var(--u));
+	font-weight: 800;
+	line-height: 1.15;
+}
+.recap-n {
+	flex: none;
+	width: calc(6.5 * var(--u));
+	height: calc(6.5 * var(--u));
+	border-radius: 50%;
+	border: 2px solid var(--cyan);
+	color: var(--cyan);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(3.4 * var(--u));
+}
+
+/* "It's a real web page": three small live demos, as many across as fit. */
+.demos {
+	display: grid;
+	grid-template-columns: repeat(
+			auto-fit,
+			minmax(min(100%, calc(40 * var(--u))), 1fr)
+		);
+	gap: calc(2.4 * var(--u));
+}
+.demo {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: calc(1.4 * var(--u));
+	padding: calc(2.4 * var(--u)) calc(2.8 * var(--u));
+	border: 2px solid var(--amber);
+	border-radius: calc(1.8 * var(--u));
+	background: var(--card);
+	color: var(--ink);
+	font: inherit;
+	text-align: left;
+	text-decoration: none;
+	cursor: pointer;
+}
+.demo:hover {
+	border-color: var(--ink);
+}
+.demo-k {
+	color: var(--amber);
+	font-size: calc(3.8 * var(--u));
+	font-weight: 800;
+}
+.demo-v {
+	position: relative;
+	display: inline-block;
+	max-width: 100%;
+	font-size: max(12px, calc(3 * var(--u)));
+	line-height: 1.4;
+}
+.demo-v svg {
+	vertical-align: -0.25em;
+}
+.nowrap {
+	white-space: nowrap;
+}
+.demo-done {
+	font-family: var(--mono);
+	font-size: max(12px, calc(2.6 * var(--u)));
+	font-weight: 600;
+	color: var(--green);
+}
+/* copy: a selection highlight sweeps across the command. */
+.sweep {
+	position: absolute;
+	inset: -0.15em -0.3em;
+	border-radius: 0.3em;
+	background: rgba(79, 216, 255, 0.35);
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform 0.7s var(--out);
+}
+.sweep.on {
+	transform: none;
+}
+/* links: a pointer glides in, the link underlines. */
+.link-demo {
+	color: var(--cyan);
+	text-decoration: underline 2px transparent;
+	text-underline-offset: 0.25em;
+	transition: text-decoration-color 0.3s 0.5s;
+}
+.link-demo.on {
+	text-decoration-color: var(--cyan);
+}
+.pointer {
+	flex: none;
+	width: 1.3em;
+	height: 1.3em;
+	margin-left: -0.6em;
+	transform: translate(3em, 1em);
+	opacity: 0;
+	transition:
+		transform 0.6s var(--out),
+		opacity 0.3s;
+}
+.pointer.on {
+	transform: none;
+	opacity: 1;
+}
+/* download: the arrow drops, the bar fills. */
+.dl-arrow {
+	flex: none;
+	width: 1.3em;
+	height: 1.3em;
+	transform: translateY(-0.6em);
+	opacity: 0.3;
+	transition:
+		transform 0.5s var(--pop),
+		opacity 0.3s;
+}
+.dl-arrow.on {
+	transform: none;
+	opacity: 1;
+}
+.dl-bar {
+	position: relative;
+	width: 100%;
+	height: calc(0.9 * var(--u));
+	border-radius: calc(0.45 * var(--u));
+	background: var(--faint);
+	overflow: hidden;
+}
+.dl-bar b {
+	position: absolute;
+	inset: 0 auto 0 0;
+	background: var(--cyan);
+	transition: width 0.9s linear;
+}
+
+/* The mock player in "It walks you through". */
+.mock {
+	display: flex;
+	flex-direction: column;
+	gap: calc(5 * var(--u));
+	padding: calc(5 * var(--u));
+}
+.mock-head {
+	display: flex;
+	align-items: center;
+	gap: calc(3 * var(--u));
+}
+.mock-cap {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 calc(1.4 * var(--u));
+	font-size: calc(5.4 * var(--u));
+	font-weight: 500;
+	color: var(--dim);
+}
+.mock-cap span {
+	padding: calc(0.2 * var(--u)) calc(0.8 * var(--u));
+	border-radius: calc(0.8 * var(--u));
+	transition:
+		background-color 0.3s,
+		color 0.3s;
+}
+.mock-cap span.said {
+	color: var(--ink);
+}
+.mock-cap span.hl {
+	background: var(--amber);
+	color: var(--bg);
+}
+.mock-track {
+	position: relative;
+	height: calc(1.4 * var(--u));
+	border-radius: calc(0.7 * var(--u));
+	background: var(--faint);
+}
+.mock-track b {
+	position: absolute;
+	inset: 0 auto 0 0;
+	border-radius: calc(0.7 * var(--u));
+	background: var(--cyan);
+	transition: width 1.2s var(--out);
+}
+.mock-track i {
+	position: absolute;
+	top: 50%;
+	width: calc(3.6 * var(--u));
+	height: calc(3.6 * var(--u));
+	margin: calc(-1.8 * var(--u)) 0 0 calc(-1.8 * var(--u));
+	border-radius: 50%;
+	background: var(--ink);
+	transition: left 1.2s var(--out);
+}
+.play-disc {
+	flex: none;
+	width: calc(10 * var(--u));
+	height: calc(10 * var(--u));
+	border-radius: 50%;
+	background: var(--red);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.play-disc svg {
+	width: 38%;
+	margin-left: 8%;
+}
+
+/* "Laptop or phone": the same content in two windows that narrow. */
+.compare {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: calc(5 * var(--u));
+}
+.panel {
+	display: flex;
+	flex-direction: column;
+	gap: calc(1.4 * var(--u));
+	min-width: 0;
+}
+.panel-cap {
+	display: flex;
+	justify-content: center;
+	gap: calc(2 * var(--u));
+}
+.box {
+	width: min(100%, calc(76 * var(--u)));
+	align-self: center;
+	aspect-ratio: 16 / 9.5;
+	display: flex;
+	justify-content: center;
+}
+.win {
+	container: mock / inline-size;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	border: calc(0.3 * var(--u)) solid var(--dim);
+	border-radius: calc(1.2 * var(--u));
+	background: #05070a;
+	overflow: hidden;
+	font-size: calc(2.4 * var(--u));
+	transition:
+		width 1.4s var(--out),
+		border-radius 1.4s var(--out);
+}
+.win.narrow {
+	width: 40%;
+	border-radius: calc(2.6 * var(--u));
+}
+.win-bar {
+	flex: none;
+	height: calc(2.4 * var(--u));
+	display: flex;
+	align-items: center;
+	gap: calc(0.6 * var(--u));
+	padding: 0 calc(1 * var(--u));
+	background: var(--faint);
+}
+.win-bar i {
+	width: calc(0.8 * var(--u));
+	height: calc(0.8 * var(--u));
+	border-radius: 50%;
+	background: var(--dim);
+}
+.win-body {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+/* The video: one fixed picture, letterboxed. Its text scales with it. */
+.win.video .win-body {
+	justify-content: center;
+}
+.pic {
+	container: pic / inline-size;
+	aspect-ratio: 16 / 9;
+	background: var(--card);
+}
+/* The little scene inside both windows. */
+.mini {
+	display: flex;
+	flex-direction: column;
+	gap: 0.8em;
+	padding: 1em;
+	color: var(--ink);
+}
+.mini b {
+	font-size: 1.4em;
+	line-height: 1.1;
+}
+/* In the video, the text is part of the picture: it scales with it. */
+.pic .mini {
+	font-size: 2.7cqw;
+}
+.mini-cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.6em;
+}
+.mini-cards span {
+	padding: 0.8em;
+	border: 1px solid var(--cyan);
+	border-radius: 0.5em;
+	background: var(--card);
+	font-weight: 800;
+}
+/* learn: the window is narrow, so the cards stack. Real CSS, live. */
+@container mock (width < 20em) {
+	.win.learn .mini-cards {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+.touch-only {
+	display: none;
+}
+@media (pointer: coarse) {
+	.touch-only {
+		display: inline;
+	}
+	.fine-only {
+		display: none;
+	}
+}
+@container stage (aspect-ratio < 1) {
+	.compare {
+		grid-template-columns: minmax(0, 1fr);
+		gap: calc(3 * var(--u));
+	}
+}
+
+/* Call to action on the last scene. */
+.cta {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: calc(2 * var(--u));
+	width: 100%;
+	max-width: calc(70 * var(--u));
+}
+.cta button,
+.cta a {
+	display: flex;
+	align-items: center;
+	gap: calc(2 * var(--u));
+	font-family: var(--mono);
+	font-size: max(14px, calc(3.4 * var(--u)));
+	font-weight: 600;
+	padding: calc(2 * var(--u)) calc(3 * var(--u));
+	border: 2px solid var(--cyan);
+	border-radius: calc(1.6 * var(--u));
+	background: var(--card);
+	color: var(--ink);
+	text-decoration: none;
+	text-align: left;
+	cursor: pointer;
+}
+.cta svg {
+	flex: none;
+	width: 1.1em;
+	height: 1.1em;
+}
+.cta .primary {
+	background: var(--cyan);
+	color: var(--bg);
+}
+.cta button:hover,
+.cta a:hover {
+	background: var(--cyan);
+	color: var(--bg);
+}
+.cta button.done {
+	border-color: var(--green);
+	background: var(--card);
+	color: var(--green);
+}
+.cta small {
+	margin-left: auto;
+	font-size: 0.8em;
+	opacity: 0.7;
+}
+
+.cta .label-sm {
+	margin: calc(1 * var(--u)) 0 0;
+}
+.cta .try {
+	border-color: var(--faint);
+	font-weight: 400;
+}
+/* Secondary actions: one quiet row of text buttons that wraps. */
+.cta-more {
+	display: flex;
+	flex-wrap: wrap;
+	gap: calc(1 * var(--u)) calc(3 * var(--u));
+	margin-top: calc(1 * var(--u));
+}
+.cta .cta-more a,
+.cta .cta-more button {
+	padding: calc(0.6 * var(--u)) 0;
+	border: 0;
+	background: none;
+	color: var(--cyan);
+	font-size: max(13px, calc(2.9 * var(--u)));
+}
+.cta .cta-more a:hover,
+.cta .cta-more button:hover {
+	background: none;
+	color: var(--ink);
+	text-decoration: underline;
+}
+.cta .cta-more button.done {
+	color: var(--green);
+}
+/* "Check out the GitHub.": the link lights up as it is said. */
+.cta .cta-more a.hot {
+	color: var(--amber);
+	text-decoration: underline;
+	text-underline-offset: 0.25em;
+}
+
+/* Scene progress dots, bottom right. */
+.foot {
+	position: absolute;
+	right: calc(3 * var(--u));
+	bottom: calc(2.4 * var(--u));
+	display: flex;
+	gap: var(--u);
+	align-items: center;
+}
+.dot {
+	width: var(--u);
+	height: var(--u);
+	border-radius: 50%;
+	background: var(--faint);
+}
+.dot.cur {
+	width: calc(1.5 * var(--u));
+	height: calc(1.5 * var(--u));
+	background: var(--red);
+}
+/* A short stage (a phone held sideways): the get-it buttons side by side. */
+@container stage (max-height: 360px) {
+	.cta {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		max-width: none;
+	}
+	.cta .label-sm {
+		display: none;
+	}
+	.cta .try,
+	.cta-more {
+		grid-column: 1 / -1;
+	}
+	.cta button,
+	.cta a {
+		padding: 6px 10px;
+		font-size: 12px;
+	}
+}
+/* The opener's first point: this is a page, not a video. */
+.webpage {
+	width: fit-content;
+	padding: calc(1 * var(--u)) calc(2.4 * var(--u));
+	border: 2px solid var(--cyan);
+	border-radius: calc(4 * var(--u));
+	font-family: var(--mono);
+	font-size: max(13px, calc(3.4 * var(--u)));
+	font-weight: 600;
+	color: var(--cyan);
+}

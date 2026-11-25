@@ -1,12 +1,19 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.6.9/schema.json",
 	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
+		"enabled": false
 	},
 	"files": {
 		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!build",
+			"!.svelte-kit",
+			"!test-results",
+			"!data/SKILL.md",
+			"!.claude/skills/learn/SKILL.md",
+			"!index.html"
+		],
 		"maxSize": 8388608
 	},
 	"formatter": {
@@ -24,14 +31,6 @@
 			"quoteStyle": "double"
 		}
 	},
-	"overrides": [
-		{
-			"includes": ["*.html"],
-			"linter": {
-				"enabled": false
-			}
-		}
-	],
 	"html": {
 		"experimentalFullSupportEnabled": true,
 		"formatter": {

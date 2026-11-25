@@ -7,7 +7,6 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!worker-configuration.d.ts"],
 		"maxSize": 8388608
 	},
 	"formatter": {

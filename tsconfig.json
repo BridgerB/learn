@@ -1,13 +1,7 @@
 {
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
-		"strict": true,
-		"types": ["$app/types", "./worker-configuration.d.ts", "node"]
+		"strict": true
 	},
-	"include": [
-		"src",
-		"vite.config.ts",
-		"playwright.config.ts",
-		"drizzle.config.ts"
-	]
+	"include": ["src", "vite.config.ts"]
 }

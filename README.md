@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-pnpm dlx sv@1.7.1 create --template minimal --types ts --add vitest="usages:unit,component" playwright="demo:yes" enhanced-img devtools="plugins:rolldown,vite,vitest,oxc" sveltekit-adapter="adapter:cloudflare+cfTarget:workers" drizzle="database:d1" better-auth="demo:password" ai-tools="ide:claude-code+delivery:plugin+optInSkills:none" --install pnpm .
+pnpm dlx sv@1.7.1 create --template minimal --types ts --install pnpm .
 ```
 
 ## Adding features
@@ -52,3 +52,5 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

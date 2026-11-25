@@ -1,0 +1,21 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "learn",
+	"compatibility_date": "2026-11-25",
+	"compatibility_flags": ["nodejs_als"],
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	"workers_dev": true,
+	"preview_urls": true,
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "learn",
+			"database_id": "0f0ac1ef-a82c-4a40-b4d7-f15e373f4275",
+			"migrations_dir": "drizzle"
+		}
+	]
+}
